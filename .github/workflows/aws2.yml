@@ -1,0 +1,43 @@
+name: EC2 instance setup
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Start EC2 instance
+      uses: aws-actions/setup-ec2@v1
+      with:
+        ami-id: ami-0c94855ba95c71c99 # free tier Amazon Linux 2 AMI
+        instance-type: t2.micro
+        security-group: default
+        subnet-id: subnet-0123456789abcdef
+        key-name: your-aws-key-name
+        region: us-east-1
+        tag-specifications: 'ResourceType=instance,Tags=[{Key=Name,Value=github-actions-ec2-instance}]'
+    
+    - name: Wait for instance to start
+      uses: aws-actions/wait-for-ec2@v1
+      with:
+        state: running
+    
+    - name: SSH into EC2 instance
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ steps.start-ec2.outputs.public_ip }}
+        username: ec2-user
+        key: ${{ secrets.AWS_PRIVATE_KEY }}
+        port: 22
+        script: |
+          git clone https://github.com/your-username/your-repo.git
+          cd your-repo
+          pip install -r requirements.txt
+          python server.py
