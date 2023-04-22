@@ -41,4 +41,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'git clone https://github.com/DorSkoler/cloud-computing-ex1.git'
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'cd ~/cloud-computing-ex1 && git pull'
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'sudo pip3 install -r ~/cloud-computing-ex1/requirements.txt'
-          ssh -n -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'cd ~/cloud-computing-ex1 && nohup sudo python3 server.py > server.log &'
+          ssh -n -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'cd ~/cloud-computing-ex1 && nohup sudo python3 server.py > server.log'
