@@ -21,6 +21,12 @@ jobs:
       - name: Add EC2 instance to known hosts
         run: |
           echo "${{ secrets.EC2_HOST }} $(ssh-keyscan -t rsa ${{ secrets.EC2_HOST }})" >> ~/.ssh/known_hosts
+          
+      - name: Kill process listening on port 4455
+        run: |
+          PID=$(ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'sudo lsof -i :4455 | awk "NR>1 {print \$2}"')
+          echo "Process with PID $PID is listening on port 4455"
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} "sudo kill $PID"
       
       - name: Deploy code to EC2 instance
         run: |
