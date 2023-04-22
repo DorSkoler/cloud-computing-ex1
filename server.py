@@ -30,6 +30,9 @@ def new_ticket():
     # if key doesn't exist, returns None
     plate_val = request.args.get('plate')
     parkingLot_val = request.args.get('parkingLot')
+    
+    if not plate_val or not parkingLot_val:
+        return "Error, missing param/s"
 
     now_timestamp = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), fmt)
     
@@ -60,6 +63,10 @@ def exit_ticket():
             <h1>The total parked time in minutes is: {}</h1>
             <h1>The cost is: {}</h1>'''.format(plate_val_return, parkingLot_val_return, total_time_return, cost_val_return)
 
+@app.route("/")
+def home():
+    return "Hello World!"
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=443)
+    app.run(debug=True)
     
