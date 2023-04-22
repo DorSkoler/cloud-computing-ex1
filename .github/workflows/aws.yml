@@ -22,11 +22,16 @@ jobs:
         run: |
           echo "${{ secrets.EC2_HOST }} $(ssh-keyscan -t rsa ${{ secrets.EC2_HOST }})" >> ~/.ssh/known_hosts
           
-      - name: Kill process listening on port 4455
+      - name: Check if process is running on port 4455
         run: |
-          PID=$(ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'sudo lsof -i :4455 | awk "NR>1 {print \$2}"')
-          echo "Process with PID $PID is listening on port 4455"
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} "sudo kill $PID"
+          PID=$(ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'sudo lsof -t -i :4455 || echo "None"')
+          if [[ $PID != "None" ]]; then
+            echo "Process is running on port 4455, PID=$PID"
+            ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'sudo kill -9 $PID'
+            echo "Process killed"
+          else
+            echo "No process is listening on port 4455"
+          fi
       
       - name: Deploy code to EC2 instance
         run: |
